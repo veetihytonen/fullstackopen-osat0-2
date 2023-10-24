@@ -11,14 +11,35 @@ const Interface = ({ good, setGood, bad, setBad, neutral, setNeutral }) => (
   </div>
 )
 
-const Statistics = ({ good, bad, neutral }) => (
-  <div>
-    <h2>statistics</h2>
-    <p>good {good}</p>
-    <p>neutral {neutral}</p>
-    <p>bad {bad}</p>
-  </div>
-)
+const StatisticLine = ({ text, statistic }) => <> <a> {text} {statistic} </a> <br/> </>
+
+const Statistics = ({ good, bad, neutral }) => {
+  const all = good + bad + neutral
+
+  if (!all) {
+    return (
+      <div>
+        <h2>statistics</h2>
+        <a>No feedback given</a>
+      </div>
+    )
+  }
+
+  const average = (good * 1 + bad * -1 + neutral * 0) / all
+  const positive = good / all
+
+  return (
+    <div>
+      <h2>statistics</h2>
+      <StatisticLine text={'good'} statistic={good} />
+      <StatisticLine text={'bad'} statistic={bad} />
+      <StatisticLine text={'neutral'} statistic={neutral} />
+      <StatisticLine text={'all'} statistic={all} />
+      <StatisticLine text={'average'} statistic={average} />
+      <StatisticLine text={'positive'} statistic={positive} />
+    </div>
+  )
+}
 
 const App = () => {
   const [good, setGood] = useState(0)
@@ -38,4 +59,3 @@ const App = () => {
 }
 
 export default App
-
