@@ -3,8 +3,19 @@ import { useState } from 'react'
 const Button = ({ text, onClick }) => <button onClick={onClick}> {text} </button>
 
 const Votes = ({ votes, selected }) => (
-  <p> has {votes[selected]} votes </p>
+  <a> has {votes[selected]} votes </a>
 )
+
+const MostVoted = ({ anecdotes, votes }) => {
+  const mostVotes = Object.entries(votes).reduce((highest, entry) => entry[1] > highest[1] ? entry : highest)[0]
+
+  return (
+    <>
+      <h2> Anecdote with most votes </h2>
+      <p> {anecdotes[mostVotes]} </p>
+    </>
+  )
+}
 
 const App = () => {
   const anecdotes = [
@@ -48,9 +59,12 @@ const App = () => {
 
   return (
     <div>
+      <h2> Anecdote of the day </h2>
       {anecdotes[selected]}
       <br />
+      <MostVoted anecdotes={anecdotes} votes={votes} />
       <Votes votes={votes} selected={selected} /> 
+      <br /> 
       <Button onClick={onVote} text={'vote'} />
       <Button onClick={onNextAnecdote} text={'next anecdote'}/>
     </div>
