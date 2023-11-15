@@ -11,7 +11,7 @@ const Interface = ({ good, setGood, bad, setBad, neutral, setNeutral }) => (
   </div>
 )
 
-const StatisticLine = ({ text, statistic }) => <> <a> {text} {statistic} </a> <br/> </>
+const StatisticLine = ({ text, statistic }) => <> {text} {statistic} </>
 
 const Statistics = ({ good, bad, neutral }) => {
   const all = good + bad + neutral
@@ -31,12 +31,14 @@ const Statistics = ({ good, bad, neutral }) => {
   return (
     <div>
       <h2>statistics</h2>
-      <StatisticLine text={'good'} statistic={good} />
-      <StatisticLine text={'bad'} statistic={bad} />
-      <StatisticLine text={'neutral'} statistic={neutral} />
-      <StatisticLine text={'all'} statistic={all} />
-      <StatisticLine text={'average'} statistic={average} />
-      <StatisticLine text={'positive'} statistic={positive} />
+      <ul style={{listStyleType: "none", padding: 0}}>
+        <li> <StatisticLine text={'good'} statistic={good} /> </li>
+        <li> <StatisticLine text={'bad'} statistic={bad} /> </li>
+        <li> <StatisticLine text={'neutral'} statistic={neutral} /> </li>
+        <li> <StatisticLine text={'all'} statistic={all} /> </li>
+        <li> <StatisticLine text={'average'} statistic={average} /> </li>
+        <li> <StatisticLine text={'positive'} statistic={positive} /> </li>
+      </ul>
     </div>
   )
 }
