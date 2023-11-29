@@ -1,10 +1,13 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 
 const Person = ({ person }) => (
   <p>{person.name} {person.number}</p>
 )
 
-const Persons = ({ personsToShow }) => {
+const Persons = ({ persons, filter }) => {
+  const personsToShow = persons.filter(person => person.name.toLowerCase().includes(filter.toLowerCase()))
+
   const asComponents = personsToShow.map(person => <Person person={person} key={person.name} />)
 
   return (
@@ -35,17 +38,19 @@ const Filter = ({ filter, onFilterChange }) => (
 )
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456' },
-    { name: 'Ada Lovelace', number: '39-44-5323523' },
-    { name: 'Dan Abramov', number: '12-43-234345' },
-    { name: 'Mary Poppendieck', number: '39-23-6423122' }
-  ])
+  const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
-  const [personsToShow, setPersonsToShow] = useState(persons)
   
+  useEffect(() => {
+    axios
+      .get('http://localhost:3001/persons')
+      .then(response => {
+        setPersons(response.data)
+      })
+  }, [])
+
   const onNameChange = (event) => {
     setNewName(event.target.value)
   }
@@ -55,11 +60,7 @@ const App = () => {
   }
 
   const onFilterChange = (event) => {
-    const currFilter = event.target.value
-    setFilter(currFilter)
-
-    const personsFiltered = persons.filter(person => person.name.toLowerCase().includes(currFilter.toLowerCase()))
-    setPersonsToShow(personsFiltered)
+    setFilter(event.target.value)
   }
 
   const onPersonSubmit = (event) => {
@@ -83,7 +84,7 @@ const App = () => {
       <h2>add a new</h2>
       <NewPersonForm onPersonSubmit={onPersonSubmit} newName={newName} onNameChange={onNameChange} newNumber={newNumber} onNumberChange={onNumberChange} />
       <h2>Numbers</h2>
-      <Persons personsToShow={personsToShow} />
+      <Persons persons={persons} filter={filter} />
     </div>
   )
 
