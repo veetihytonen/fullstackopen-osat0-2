@@ -1,6 +1,50 @@
 import { useState, useEffect } from 'react'
 import personService from './services/persons'
 
+const Error = ({ message }) => {
+  if (message === null) {
+    return null
+  }
+
+  const style = {
+    color: 'red',
+    background: 'lightgrey',
+    fontSize: 20,
+    borderStyle: 'solid',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10
+  }
+
+  return (
+    <div style={style}>
+      {message}
+    </div>
+  )
+}
+
+const Notification = ({ message }) => {
+  if (message === null) {
+    return null
+  }
+
+  const style = {
+    color: 'green',
+    background: 'lightgrey',
+    fontSize: 20,
+    borderStyle: 'solid',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10
+  }
+  
+  return (
+    <div style={style}>
+      {message}
+    </div>
+  )
+}
+
 const Person = ({ person, deletePerson }) => (
   <>
     <p>{person.name} {person.number} <button onClick={() => deletePerson(person.id)}>delete</button> </p>
@@ -44,6 +88,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+  const [notification, setNotification] = useState(null)
+  const [error, setError] = useState(null)
   
   useEffect(() => {
     personService
@@ -58,6 +104,20 @@ const App = () => {
     setNewNumber('')
   }
 
+  const timeNotification = (message, seconds) => {
+    setNotification(message)
+    setTimeout(() => {
+      setNotification(null)
+    }, seconds * 1000)
+  }
+
+  const timeError = (message, seconds) => {
+    setError(message)
+    setTimeout(() => {
+      setError(null)
+    }, seconds * 1000)
+  }
+
   const deletePerson = (personId) => {
     const name = persons.find(person => person.id === personId).name
     if (! window.confirm(`Delete ${name}?`)) {
@@ -66,8 +126,9 @@ const App = () => {
 
     personService
       .remove(personId)
-      .then(() => {
+      .then(removedPerson => {
         setPersons(persons.filter(person => person.id !== personId))
+        timeNotification(`Removed ${name}`, 5)
       })
   }
 
@@ -94,7 +155,11 @@ const App = () => {
           .update(updatedPerson.id, updatedPerson)
           .then(returnedPerson => {
             setPersons(persons.map(person => person.id !== returnedPerson.id ? person : returnedPerson))
+            timeNotification(`Modified number for ${returnedPerson.name}`, 5)
             clearForm()
+          })
+          .catch(error => {
+            timeError(`${updatedPerson.name} was already removed from server`, 5)
           })
       }
 
@@ -107,6 +172,7 @@ const App = () => {
       .create(newPerson)
       .then(returnedPerson => {
         setPersons(persons.concat(returnedPerson))
+        timeNotification(`Added ${returnedPerson.name}`, 5)
         clearForm()
       })
   }
@@ -114,6 +180,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Error message={error} />
+      <Notification message={notification} />
       <Filter filter={filter} onFilterChange={onFilterChange} persons={persons} setPersons={setPersons} />
       <h2>add a new</h2>
       <NewPersonForm onPersonSubmit={onPersonSubmit} newName={newName} onNameChange={onNameChange} newNumber={newNumber} onNumberChange={onNumberChange} />
