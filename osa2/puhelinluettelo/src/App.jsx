@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react'
 import personService from './services/persons'
 
-const Person = ({ person }) => (
-  <p>{person.name} {person.number}</p>
+const Person = ({ person, deletePerson }) => (
+  <>
+    <p>{person.name} {person.number} <button onClick={() => deletePerson(person.id)}>delete</button> </p>
+  </>
 )
 
-const Persons = ({ persons, filter }) => {
+const Persons = ({ persons, filter, deletePerson }) => {
   const personsToShow = persons.filter(person => person.name.toLowerCase().includes(filter.toLowerCase()))
 
-  const asComponents = personsToShow.map(person => <Person person={person} key={person.name} />)
+  const asComponents = personsToShow.map(person => <Person person={person} key={person.name} deletePerson={deletePerson} />)
 
   return (
     <>
@@ -56,6 +58,19 @@ const App = () => {
     setNewNumber('')
   }
 
+  const deletePerson = (personId) => {
+    const name = persons.find(person => person.id === personId).name
+    if (! window.confirm(`Delete ${name}?`)) {
+      return
+    }
+
+    personService
+      .remove(personId)
+      .then(() => {
+        setPersons(persons.filter(person => person.id !== personId))
+      })
+  }
+
   const onNameChange = (event) => {
     setNewName(event.target.value)
   }
@@ -94,7 +109,7 @@ const App = () => {
       <h2>add a new</h2>
       <NewPersonForm onPersonSubmit={onPersonSubmit} newName={newName} onNameChange={onNameChange} newNumber={newNumber} onNumberChange={onNumberChange} />
       <h2>Numbers</h2>
-      <Persons persons={persons} filter={filter} />
+      <Persons persons={persons} filter={filter} deletePerson={deletePerson} />
     </div>
   )
 
