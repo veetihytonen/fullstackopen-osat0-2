@@ -26,7 +26,7 @@ const SingleCountry = ({ country }) => {
   )
 }
 
-const DisplayCountries = ({ countries, filter }) => {
+const DisplayCountries = ({ countries, filter, onShowCountry }) => {
   if (countries.length === 0 || !filter) {
     return (
       <p>Too many matches, specify another filter</p>
@@ -34,8 +34,8 @@ const DisplayCountries = ({ countries, filter }) => {
   }
 
   const filteredCountries = countries.filter(country => 
-    country.name.common.toLowerCase().includes(filter) || 
-    country.name.official.toLowerCase().includes(filter)
+    country.name.common.toLowerCase().includes(filter.toLowerCase()) || 
+    country.name.official.toLowerCase().includes(filter.toLowerCase())
   )
 
   if (filteredCountries.length > 10) {
@@ -46,7 +46,10 @@ const DisplayCountries = ({ countries, filter }) => {
 
   if (filteredCountries.length > 1) {
     const countryNames = filteredCountries.map(country => 
-      <li key={country.fifa}> {country.name.common} </li>
+      <li key={country.fifa}> 
+        {country.name.common} 
+        <button onClick={() => onShowCountry(country.name.common)}> show </button> 
+      </li>
     )
 
     return (
@@ -79,16 +82,18 @@ const App = () => {
       })
   }, [])
 
-
-
   const onFilterChange = (event) => {
-    setFilter(event.target.value.toLowerCase())
+    setFilter(event.target.value)
+  }
+
+  const onShowCountry = (name) => {
+    setFilter(name)
   }
 
   return (
     <>
-      <SearchField filter={filter} onFilterChange={onFilterChange}/>
-      <DisplayCountries countries={countries} filter={filter} /> 
+      <SearchField filter={filter} onFilterChange={onFilterChange} />
+      <DisplayCountries countries={countries} filter={filter} onShowCountry={onShowCountry} /> 
     </>
   )
 }
